@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/offbeatPlaces.css">
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="container"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics.js";
+        import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+        import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD9FiUMcOqB3LyLeV1m17WcheDdnTguIU8",
+            authDomain: "login-9e25c.firebaseapp.com",
+            databaseURL: "https://login-9e25c-default-rtdb.firebaseio.com",
+            projectId: "login-9e25c",
+            storageBucket: "login-9e25c.appspot.com",
+            messagingSenderId: "3084488877",
+            appId: "1:3084488877:web:44423bdc1fe8c3bda27624",
+            measurementId: "G-JFK3YNCJJB"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const database = getDatabase();
+        const storage = getStorage();
+        const container = document.querySelector(".container");
+        const userRef = ref(database, "posted");
+        onValue(userRef, (snapshot) => {
+            const userData = snapshot.val();
+            if (userData) {
+                Object.keys(userData).forEach((userId) => {
+                    const user = userData[userId];
+                    console.log(userData);
+                    if (user.city == localStorage.getItem('city')) {
+                        const name = user.username;
+                        const desc = user.description.slice(0, 30);
+                        const link = user.link;
+                        const city = user.city;
+                        const photoName = user.photo;
+                        const newDiv = document.createElement('div');
+                        newDiv.className = "my-class";
+                        const imageRef = storageRef(storage, `files/${photoName}`);
+
+                        const img = document.createElement('img');
+                        getDownloadURL(imageRef).then((url) => {
+                            console.log(url);
+                            img.src = url;
+                            img.className = 'image-container'
+                            newDiv.appendChild(img);
+                            const descDiv = document.createElement('div');
+                            descDiv.innerHTML = "NAME :" + name + "DESC :" + desc + "LINK:" + link;
+                            newDiv.appendChild(descDiv);
+                            container.appendChild(newDiv);
+                        })
+
+
+                    }
+
+
+
+                })
+
+
+            }
+            // console.log(userData)
+            console.log(localStorage.getItem('city'))
+
+        })
+    </script>
+
+</body>
+
+
+</html>

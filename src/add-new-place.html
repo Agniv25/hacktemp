@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Form</title>
+  <link rel="stylesheet" href="css/add-new-place.css">
+</head>
+
+<body>
+  <h1> Add places You Like </h1>
+  <form id="login-form">
+    <label>Image:</label>
+    <input id="image-file" type="file" name="image" accept="image/*">
+    <br>
+    <textarea id="description" rows="4" cols="50"></textarea>
+    <label>CITY :</label>
+    <input id="city" class="destination" type="text" placeholder="Enter city ">
+
+    <label>Location :</label>
+    <input id="location-link" class="destination" type="text" placeholder="Enter location ">
+    <br>
+    <button id="button"> SUBMIT</button>
+
+  </form>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics.js";
+    import { getDatabase, ref, push, onValue, set, child } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+    import { getStorage, ref as storageRef, uploadBytes } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD9FiUMcOqB3LyLeV1m17WcheDdnTguIU8",
+      authDomain: "login-9e25c.firebaseapp.com",
+      databaseURL: "https://login-9e25c-default-rtdb.firebaseio.com",
+      projectId: "login-9e25c",
+      storageBucket: "login-9e25c.appspot.com",
+      messagingSenderId: "3084488877",
+      appId: "1:3084488877:web:44423bdc1fe8c3bda27624",
+      measurementId: "G-JFK3YNCJJB"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const database = getDatabase();
+    const storage = getStorage();
+
+    const loginForm = document.getElementById("button");
+
+    loginForm.addEventListener('click', (event) => {
+      event.preventDefault();
+      //input details
+      const name = localStorage.getItem('username');
+      const desc = document.getElementById('description').value;
+      const file = document.getElementById('image-file').files[0];
+      const locationLink = document.getElementById('location-link').value;
+      const city = document.getElementById('city').value;
+      const newPostKey = push(child(ref(database), 'posted')).key;
+
+      set(ref(database, 'posted/' + newPostKey), {
+        username: name,
+        description: desc,
+        link: locationLink,
+        photo: file.name,
+        city: city
+      })
+        .then(() => {
+          console.log("dataSaved");
+
+        })
+        .catch((error) => {
+          // The write failed...
+        });
+      if (file) {
+        const filestorageRef = storageRef(storage, "files/" + file.name);
+        const uploadTask = uploadBytes(filestorageRef, file);
+
+        uploadTask.then((snapshot) => {
+          console.log("File uploaded successfully!");
+          alert("Uploaded successfully")
+          // You can redirect to another page or display a success message here
+        }).catch((error) => {
+          console.error("Error uploading file:", error);
+          // Handle the error, display an error message, etc.
+        });
+      } else {
+        console.log("No file selected.");
+      }
+
+
+    });
+
+  </script>
+
+
+
+
+
+</body>
+
+
+</html>

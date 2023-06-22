@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="author" content="Kodinger">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Login Page</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="css/signin.css">
+</head>
+
+<body class="my-login-page">
+    <section class="h-100">
+        <div class="container h-100">
+            <div class="row justify-content-md-center h-100">
+                <div class="card-wrapper">
+                    <div class="brand">
+                        <img src="images/logo.jpg" alt="bootstrap 4 login page">
+                    </div>
+                    <div class="card fat">
+                        <div class="card-body">
+                            <h4 class="card-title">Register</h4>
+                            <form id="loginForm" class="my-login-validation">
+                                <div class="form-group">
+                                    <label for="name">Name</label>
+                                    <input id="name" type="text" class="form-control" name="name" required autofocus>
+
+                                    <label for="password">Password</label>
+                                    <input id="password" type="password" class="form-control" name="password">
+                                    <div class="custom-checkbox custom-control">
+
+                                        <button id="submit" type="submit"
+                                            class="btn btn-primary btn-block">REGISTER</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="footer">
+                        Copyright &copy; 2017 &mdash; Your Company
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics.js";
+        import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+        import { getStorage, ref as storageRef, uploadBytes } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js";
+        const firebaseConfig = {
+            apiKey: "AIzaSyD9FiUMcOqB3LyLeV1m17WcheDdnTguIU8",
+            authDomain: "login-9e25c.firebaseapp.com",
+            databaseURL: "https://login-9e25c-default-rtdb.firebaseio.com",
+            projectId: "login-9e25c",
+            storageBucket: "login-9e25c.appspot.com",
+            messagingSenderId: "3084488877",
+            appId: "1:3084488877:web:44423bdc1fe8c3bda27624",
+            measurementId: "G-JFK3YNCJJB"
+        };
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const database = getDatabase();
+        const storage = getStorage();
+        const container = document.querySelector(".container");
+        const userRef = ref(database, "users");
+        document.addEventListener("DOMContentLoaded", function () {
+            onValue(userRef, (snapshot) => {
+                const userData = snapshot.val();
+
+                document.getElementById("loginForm").addEventListener("submit", function (event) {
+                    event.preventDefault();
+                    const name_input = document.getElementById("name").value;
+                    const password_input = document.getElementById("password").value;
+                    var notFound = true;
+
+                    if (name_input == "" || password_input == "") {
+                        alert("Please fill in all the login details");
+                    } else {
+                        if (userData) {
+                            Object.keys(userData).forEach((userId) => {
+                                const user = userData[userId];
+                                const name = user.username;
+                                const password = user.password;
+                                if (name == name_input && password_input == password) {
+                                    notFound = false;
+
+
+                                    window.location.href = "indexaftersignup.html";
+                                }
+                            })
+                            if (notFound) {
+                                alert("User Not found");
+                            }
+
+
+
+
+                        }
+
+                    }
+                });
+
+
+
+            })
+
+        });
+
+    </script>
+</body>
+
+</html>
