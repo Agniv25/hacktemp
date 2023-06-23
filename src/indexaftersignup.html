@@ -1,4 +1,104 @@
-</div>
+<!-- </div>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ManMandir</title>
+    <link rel="stylesheet" href="css/indexaftersignup.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
+
+</head>
+
+<body>
+    <header class="header">
+        <nav class="navbar">
+            <div class="logo">travels</div>
+            <ul class="nav-item">
+                <p>WELCOME</p>
+            </ul>
+
+
+            <div class="icons">
+                <p class="usernamedisplay"></p>
+                <div class="user">
+                    <i class="fa-solid fa-user"></i>
+                    <div class="dropdown-content">
+                        <ul>
+                            <li><a href="#">Profile</a></li>
+                            <li><a href="#">Settings</a></li>
+                            <li><a href="index.html">Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </nav>
+    </header>
+
+    <section class="home" id="home">
+        <div class="content">
+            <h3>adventure is worthwhile</h3>
+            <p>discover new places with us, adventure awaits</p>
+            <a href="#book" class="btn">Discover</a>
+            <a href="add-new-place2.html" class="btn btn2">Add More</a>
+        </div>
+
+
+
+        <div class="video-container">
+            <video src="images/vid-1.mp4" id="video-slider" loop autoplay muted></video>
+        </div>
+    </section>
+
+    
+    <div class="book" id="book">
+        <div class="heading">DISCOVER</div>
+        <div class="row">
+            <div class="image">
+                <img src="images/book-img.svg" alt="" />
+            </div>
+            <form action="">
+                <div class="input-box">
+                    <label for="">where to</label>
+                    <input id="city" class="destination" type="text" placeholder="Enter city ">
+                    <button id="city-btn" class="btn btn-primary btn-block">SEARCH</button>
+
+
+
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+
+    <script type="module">
+        var username = document.querySelector(".usernamedisplay");
+        username.innerHTML = localStorage.getItem("username");
+
+        document.getElementById("city-btn").addEventListener('click', (event) => {
+            event.preventDefault();
+
+
+
+
+            var city = document.getElementById('city').value
+            localStorage.setItem('city', city);
+            window.location.href = "OffbeatPlaces2.html";
+        })
+
+    </script>
+
+</body>
+
+</html>
+
+</body>
+
+</html> -->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -63,13 +163,13 @@
             <form action="">
                 <div class="input-box">
                     <label for="">where to</label>
-                    <input id="city" class="destination" type="text" placeholder="Enter city ">
+                    <input id="city" class="destination" type="text" placeholder="Enter city" />
+                    <div class="checkbox-container">
+                        <input id="auto-detect" type="checkbox" />
+                        <label for="auto-detect">Automatically Detect</label>
+                    </div>
                     <button id="city-btn" class="btn btn-primary btn-block">SEARCH</button>
-
-
-
                 </div>
-
             </form>
         </div>
     </div>
@@ -78,23 +178,96 @@
     <script type="module">
         var username = document.querySelector(".usernamedisplay");
         username.innerHTML = localStorage.getItem("username");
+        var stateName = "";
 
         document.getElementById("city-btn").addEventListener('click', (event) => {
             event.preventDefault();
 
+            var city = document.getElementById('city').value;
+            if (stateName == "") {
+                localStorage.setItem('city', city);
+            }
+            else {
+                localStorage.setItem('city', stateName);
 
+            }
 
-
-            var city = document.getElementById('city').value
-            localStorage.setItem('city', city);
             window.location.href = "OffbeatPlaces2.html";
-        })
+        });
 
+        document.getElementById("auto-detect").addEventListener('change', (event) => {
+            var cityInput = document.getElementById('city');
+            cityInput.disabled = event.target.checked;
+            cityInput.value = '';
+
+            if (event.target.checked) {
+                // Call a function to automatically detect location and populate the input field
+                autoDetectLocation();
+            }
+        });
+
+        function autoDetectLocation() {
+            if ('geolocation' in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        // Retrieve the latitude and longitude coordinates
+                        const latitude = position.coords.latitude;
+                        const longitude = position.coords.longitude;
+
+                        // Call a function or make an API request with the coordinates
+                        // For example, you can use the MapQuest Geocoding API as shown in the previous examples
+                        // fetchCityByCoordinates(latitude, longitude);
+                        fetchCityByCoordinates(latitude, longitude)
+                    },
+                    error => {
+                        console.error('Error:', error);
+                    }
+                );
+            } else {
+                console.log('Geolocation is not supported by this browser.');
+            }
+        }
+
+
+        function fetchCityByCoordinates(latitude, longitude) {
+            // Replace with your code to fetch the city name using the coordinates
+            // You can use a reverse geocoding API or any other method to retrieve the city name
+            // Once you have the city name, populate it in the input field
+            // Replace with your MapQuest API key
+            const API_KEY = 'Vf9zhhEnhgtycnQwlUXv8lQJ7BHViw8j';
+
+            // Replace with your current latitude and longitude coordinates
+            const LATITUDE = latitude;
+            const LONGITUDE = longitude;
+
+            // Construct the API request URL
+            const url = `http://www.mapquestapi.com/geocoding/v1/reverse?key=${API_KEY}&location=${LATITUDE},${LONGITUDE}`;
+
+            // Send the API request
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    // Extract the state name
+                    stateName = data.results[0].locations[0].adminArea3;
+                    if (stateName == "KA") {
+                        stateName = "KARNATAKA";
+                    }
+                    if (stateName == "DL") {
+                        stateName = "MAHARASHTRA";
+                    }
+
+                    // Print the state name
+                    console.log('State Name:', stateName);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+            const cityInput = document.getElementById('city');
+            cityInput.value = stateName; // Replace 'City Name' with the actual fetched city name
+            console.log(latitude + " " + longitude);
+        }
     </script>
-
-</body>
-
-</html>
 
 </body>
 

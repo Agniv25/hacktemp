@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script type="module">
+        // Check if the Geolocation API is supported by the browser
+        if ('geolocation' in navigator) {
+            // Request the user's location
+            navigator.geolocation.getCurrentPosition(
+                position => {
+                    // Retrieve the latitude and longitude coordinates
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+                    // Replace with your MapQuest API key
+                    const API_KEY = 'Vf9zhhEnhgtycnQwlUXv8lQJ7BHViw8j';
+
+                    // Replace with your current latitude and longitude coordinates
+                    const LATITUDE = latitude;
+                    const LONGITUDE = longitude;
+
+                    // Construct the API request URL
+                    const url = `http://www.mapquestapi.com/geocoding/v1/reverse?key=${API_KEY}&location=${LATITUDE},${LONGITUDE}`;
+
+                    // Send the API request
+                    fetch(url)
+                        .then(response => response.json())
+                        .then(data => {
+                            // Extract the state name
+                            const stateName = data.results[0].locations[0].adminArea3;
+
+                            // Print the state name
+                            console.log('State Name:', stateName);
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+
+
+                    // Log the coordinates to the console
+                    console.log('Latitude:', latitude);
+                    console.log('Longitude:', longitude);
+
+                    // Call a function or make an API request with the coordinates
+                    // For example, you can use the MapQuest Geocoding API as shown in the previous examples
+                },
+                error => {
+                    console.error('Error:', error);
+                }
+            );
+        } else {
+            console.log('Geolocation is not supported by this browser.');
+        }
+
+    </script>
+</body>
+
+</html>
