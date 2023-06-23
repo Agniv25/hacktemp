@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="css/add-new-place2.css">
+</head>
+
+<body>
+    <br><br>
+    <h1>Add a Place</h1>
+    <form action="" method="" enctype="">
+        <label for="location">NAME</label>
+        <input type="text" id="location" name="location" required><br><br>
+
+        <label for="cityname">City</label>
+        <input type="text" id="cityname" name="cityname" required><br><br>
+
+        <label>
+            <input type="radio" name="locationType" value="manual" checked> Enter Location Manually
+        </label>
+        <label>
+            <input type="radio" name="locationType" value="current"> Use Current Location
+        </label>
+
+        <div id="manualLocationContainer">
+            <label>
+                Manual Location:
+                <input type="text" id="manualLocationInput">
+            </label>
+        </div>
+
+        <button id="getLocationButton">Get Location</button>
+
+        <label for="description">Description</label><br>
+        <textarea id="description" name="description" rows="4" cols="50" required></textarea><br><br>
+
+        <label for="file">File:</label>
+        <input type="file" id="file" name="file" required><br><br>
+        <button id="button">Submit</button>
+
+
+    </form>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics.js";
+        import { getDatabase, ref, push, onValue, set, child } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+        import { getStorage, ref as storageRef, uploadBytes } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD9FiUMcOqB3LyLeV1m17WcheDdnTguIU8",
+            authDomain: "login-9e25c.firebaseapp.com",
+            databaseURL: "https://login-9e25c-default-rtdb.firebaseio.com",
+            projectId: "login-9e25c",
+            storageBucket: "login-9e25c.appspot.com",
+            messagingSenderId: "3084488877",
+            appId: "1:3084488877:web:44423bdc1fe8c3bda27624",
+            measurementId: "G-JFK3YNCJJB"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const database = getDatabase();
+        const storage = getStorage();
+
+        const loginForm = document.getElementById("button");
+        var manualLocationContainer = document.getElementById("manualLocationContainer");
+        var getLocationButton = document.getElementById("getLocationButton");
+
+        // Event listener for the radio button selection
+        document.getElementsByName("locationType").forEach(function (radio) {
+            radio.addEventListener("change", function () {
+                if (this.value === "manual") {
+                    manualLocationContainer.style.display = "block";
+                } else {
+                    manualLocationContainer.style.display = "none";
+                }
+            });
+        });
+
+        // Event listener for the "Get Location" button
+        var isManual = true;
+
+        var latitudeFinal = "";
+        var longitudeFinal = "";
+        getLocationButton.addEventListener("click", function () {
+            var locationType = document.querySelector('input[name="locationType"]:checked').value;
+
+            if (locationType === "manual") {
+
+
+                var manualLocationInput = document.getElementById("manualLocationInput");
+                var manualLocation = manualLocationInput.value;
+                // Use the manually entered location
+
+                console.log("Manually entered location: " + manualLocation);
+            } else {
+                // Get the current location
+
+                if ("geolocation" in navigator) {
+                    navigator.geolocation.getCurrentPosition(function (position) {
+
+                        isManual = false;
+                        var latitude = position.coords.latitude;
+                        var longitude = position.coords.longitude;
+                        latitudeFinal = latitude;
+                        longitudeFinal = longitude;
+                        console.log("Current location - Latitude: " + latitude + ", Longitude: " + longitude);
+
+                    });
+                } else {
+                    console.log("Geolocation is not supported by your browser");
+                }
+            }
+        });
+
+        loginForm.addEventListener('click', (event) => {
+            event.preventDefault();
+            //input details
+            const name = localStorage.getItem('username');
+            const desc = document.getElementById('description').value;
+            const file = document.getElementById('file').files[0];
+            var locationLink;
+
+            if (isManual == true) {
+                locationLink = document.getElementById('manualLocationInput').value;
+                latitudeFinal = "";
+                longitudeFinal = "";
+                console.log(locationLink);
+
+            }
+            else if (isManual == false) {
+                locationLink = "";
+            }
+
+            const state = document.getElementById('cityname').value;
+            const newPostKey = push(child(ref(database), 'posted')).key;
+            const placeName = document.getElementById('location').value;
+
+            set(ref(database, 'posted/' + newPostKey), {
+                username: name,
+                description: desc,
+                link: locationLink,
+                photo: file.name,
+                city: state,
+                placeName: placeName,
+                isManual: isManual,
+                latitude: latitudeFinal,
+                longitude: longitudeFinal
+
+            })
+                .then(() => {
+                    console.log("dataSaved");
+
+                })
+                .catch((error) => {
+                    // The write failed...
+                });
+            if (file) {
+                const filestorageRef = storageRef(storage, "files/" + file.name);
+                const uploadTask = uploadBytes(filestorageRef, file);
+
+                uploadTask.then((snapshot) => {
+                    console.log("File uploaded successfully!");
+                    alert("Uploaded successfully")
+                    // You can redirect to another page or display a success message here
+                }).catch((error) => {
+                    console.error("Error uploading file:", error);
+                    // Handle the error, display an error message, etc.
+                });
+            } else {
+                console.log("No file selected.");
+            }
+
+
+        });
+
+    </script>
+
+</body>
+
+</html>

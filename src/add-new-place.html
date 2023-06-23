@@ -48,6 +48,19 @@
     const storage = getStorage();
 
     const loginForm = document.getElementById("button");
+    if ("geolocation" in navigator) {
+      // Geolocation is available
+      navigator.geolocation.getCurrentPosition(function (position) {
+        var latitude = position.coords.latitude;
+        var longitude = position.coords.longitude;
+        console.log("Latitude: " + latitude + ", Longitude: " + longitude);
+
+        // You can perform further actions with the latitude and longitude here
+      });
+    } else {
+      // Geolocation is not supported
+      console.log("Geolocation is not supported by your browser");
+    }
 
     loginForm.addEventListener('click', (event) => {
       event.preventDefault();
